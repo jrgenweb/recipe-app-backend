@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  picture   String     @default("https://placehold.co/400")
+  email     String     @unique
+  password  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  role      String     @default("USER")
+  recipes   Recipe[]
+  comments  Comment[]
+  favorites Favorite[]
+  ratings   Rating[]
+}
+
+model Recipe {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  avgRating         Float              @default(0)
+  ratingCount       Int                @default(0)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeCategories  RecipeCategory[]
+  comments          Comment[]
+  favorites         Favorite[]
+  ratings           Rating[]
+  recipeImages      RecipeImage[]
+  recipeIngredients RecipeIngredient[]
+  recipeSteps       RecipeStep[]
+  cuisine           Cuisine            @relation(fields: [cuisineId], references: [id])
+  cuisineId         String
+
+  @@index([avgRating])
+}
+
+model Cuisine {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  recipes Recipe[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipeCategories RecipeCategory[]
+}
+
+model RecipeCategory {
+  recipeId   String
+  categoryId String
+
+  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([recipeId, categoryId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  userId    String
+  recipeId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+model Favorite {
+  recipeId  String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([recipeId, userId])
+}
+
+model Rating {
+  userId    String
+  recipeId  String
+  rate      Int // 1-5
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, recipeId])
+}
+
+model RecipeImage {
+  id        String   @id @default(cuid())
+  url       String
+  recipeId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+model Ingredient {
+  id   String @id @default(cuid())
+  name String @unique
+  unit String // 'g' | 'ml' | 'db' vagy egyéb
+
+  recipeIngredients RecipeIngredient[]
+}
+
+model RecipeIngredient {
+  id           String @id @default(cuid())
+  recipeId     String
+  ingredientId String
+  quantity     Int
+
+  recipe     Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+}
+
+model RecipeStep {
+  id          String   @id @default(cuid())
+  recipeId    String
+  name        String
+  description String
+  stepOrder   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
