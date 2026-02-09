@@ -9,10 +9,17 @@ export class CategoriesService {
     return this.prisma.category.create({ data: { name } });
   }
 
-  async findAll(skip = 0, take = 50) {
+  async findAll(skip = 0, take = 50, search?: string) {
+    const where = search ? { OR: [{ name: { contains: search } }] } : {};
+
     const [data, total] = await Promise.all([
-      this.prisma.category.findMany({ skip, take, orderBy: { name: "asc" } }),
-      this.prisma.category.count(),
+      this.prisma.category.findMany({
+        where,
+        skip,
+        take,
+        orderBy: { name: "asc" },
+      }),
+      this.prisma.category.count({ where }),
     ]);
     return { data, total };
   }

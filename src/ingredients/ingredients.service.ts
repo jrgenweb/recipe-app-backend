@@ -9,7 +9,7 @@ export class IngredientsService {
     return this.prisma.ingredient.create({ data: { name, unit } });
   }
 
-  async findAll(skip = 0, take = 100, search?: string) {
+  async findAll(skip = 0, take = 20, search?: string) {
     const where = search
       ? { OR: [{ name: { contains: search } }, { unit: { contains: search } }] }
       : {};

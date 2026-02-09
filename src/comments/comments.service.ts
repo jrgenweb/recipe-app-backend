@@ -16,7 +16,7 @@ export class CommentsService {
     if (!recipe) throw new NotFoundException("Recept nem található");
     return this.prisma.comment.create({
       data: { userId, recipeId, text },
-      include: { user: { select: { id: true, name: true, email: true } } },
+      include: { user: { select: { id: true, name: true, picture: true } } },
     });
   }
 
@@ -27,7 +27,7 @@ export class CommentsService {
         skip,
         take,
         orderBy: { createdAt: "desc" },
-        include: { user: { select: { id: true, name: true } } },
+        include: { user: { select: { id: true, name: true, picture: true } } },
       }),
       this.prisma.comment.count({ where: { recipeId } }),
     ]);

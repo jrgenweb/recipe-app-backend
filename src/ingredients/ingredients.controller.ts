@@ -12,6 +12,7 @@ import {
 import { IngredientsService } from "./ingredients.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { IsString, MinLength } from "class-validator";
+import { AdminGuard } from "@/auth/guards/admin-auth.guard";
 
 class CreateIngredientDto {
   @IsString()
@@ -27,7 +28,7 @@ export class IngredientsController {
   constructor(private ingredients: IngredientsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   create(@Body() dto: CreateIngredientDto) {
     return this.ingredients.create(dto.name, dto.unit);
   }
@@ -51,13 +52,13 @@ export class IngredientsController {
   }
 
   @Patch(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   update(@Param("id") id: string, @Body() dto: CreateIngredientDto) {
     return this.ingredients.update(id, dto.name, dto.unit);
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   remove(@Param("id") id: string) {
     return this.ingredients.remove(id);
   }

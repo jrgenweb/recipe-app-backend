@@ -14,6 +14,8 @@ import { CreateRecipeDto } from "./dto/create-recipe.dto";
 import { UpdateRecipeDto } from "./dto/update-recipe.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
+import { query } from "express";
+import { AdminGuard } from "@/auth/guards/admin-auth.guard";
 
 @Controller("recipes")
 export class RecipesController {
@@ -31,6 +33,7 @@ export class RecipesController {
     @Query("take") take?: string,
     @Query("categoryId") categoryId?: string,
     @Query("cuisinId") cuisinId?: string,
+    @Query("ingredientIds") ingredientIds?: string,
     @Query("search") search?: string,
   ) {
     return this.recipes.findAll(
@@ -38,6 +41,7 @@ export class RecipesController {
       take ? parseInt(take, 10) : 20,
       categoryId,
       cuisinId,
+      ingredientIds ? ingredientIds.split(",") : [],
       search,
     );
   }
@@ -49,6 +53,7 @@ export class RecipesController {
     @Query("skip") skip?: string,
     @Query("take") take?: string,
     @Query("categoryId") categoryId?: string,
+    @Query("cuisineId") cuisineId?: string,
     @Query("search") search?: string,
   ) {
     return this.recipes.findByUser(
@@ -56,6 +61,7 @@ export class RecipesController {
       skip ? parseInt(skip, 10) : 0,
       take ? parseInt(take, 10) : 20,
       categoryId,
+      cuisineId,
       search,
     );
   }
@@ -79,5 +85,10 @@ export class RecipesController {
   @UseGuards(JwtAuthGuard)
   remove(@Param("id") id: string, @CurrentUser() user: { id: string }) {
     return this.recipes.remove(id, user.id);
+  }
+  @Delete("admin/:id")
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  adminRemove(@Param("id") id: string) {
+    return this.recipes.adminRemove(id);
   }
 }

@@ -9,9 +9,16 @@ export class CuisinesService {
     return this.prisma.cuisine.create({ data: { name } });
   }
 
-  async findAll(skip = 0, take = 50) {
+  async findAll(skip = 0, take = 50, search?: string) {
+    const where = search ? { OR: [{ name: { contains: search } }] } : {};
+
     const [data, total] = await Promise.all([
-      this.prisma.cuisine.findMany({ skip, take, orderBy: { name: "asc" } }),
+      this.prisma.cuisine.findMany({
+        skip,
+        take,
+        orderBy: { name: "asc" },
+        where,
+      }),
       this.prisma.cuisine.count(),
     ]);
     return { data, total };

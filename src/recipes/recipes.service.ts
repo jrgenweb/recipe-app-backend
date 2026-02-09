@@ -47,6 +47,7 @@ export class RecipesService {
         recipeSteps: { orderBy: { stepOrder: "asc" } },
         recipeIngredients: { include: { ingredient: true } },
         recipeImages: true,
+        _count: { select: { comments: true, ratings: true } },
       },
     });
     return recipe;
@@ -57,6 +58,7 @@ export class RecipesService {
     take = 20,
     categoryId?: string,
     cuisineId?: string,
+    ingredientIds?: string[],
     search?: string,
   ) {
     const where: Record<string, unknown> = {};
@@ -65,6 +67,11 @@ export class RecipesService {
     }
     if (categoryId) {
       where.recipeCategories = { some: { categoryId } };
+    }
+    if (ingredientIds && ingredientIds.length > 0) {
+      where.recipeIngredients = {
+        some: { ingredientId: { in: ingredientIds } },
+      };
     }
     if (search) {
       where.OR = [
@@ -79,7 +86,7 @@ export class RecipesService {
         take,
         orderBy: { createdAt: "desc" },
         include: {
-          user: { select: { id: true, name: true } },
+          user: { select: { id: true, name: true, picture: true } },
           recipeCategories: { include: { category: true } },
           recipeImages: { take: 1 },
           _count: { select: { ratings: true, comments: true } },
@@ -94,7 +101,7 @@ export class RecipesService {
     const recipe = await this.prisma.recipe.findUnique({
       where: { id },
       include: {
-        user: { select: { id: true, name: true, email: true } },
+        user: { select: { id: true, name: true, picture: true } },
         cuisine: { select: { id: true, name: true } },
         recipeCategories: { include: { category: true } },
         recipeSteps: { orderBy: { stepOrder: "asc" } },
@@ -203,11 +210,15 @@ export class RecipesService {
     skip = 0,
     take = 20,
     categoryId?: string,
+    cuisineId?: string,
     search?: string,
   ) {
     const where: Record<string, unknown> = {
       userId,
     };
+    if (cuisineId) {
+      where.cuisineId = cuisineId;
+    }
     if (categoryId) {
       where.recipeCategories = { some: { categoryId } };
     }
@@ -233,5 +244,14 @@ export class RecipesService {
       this.prisma.recipe.count({ where }),
     ]);
     return { data, total };
+  }
+
+  /** ADMIN */
+  async adminRemove(id: string) {
+    const recipe = await this.prisma.recipe.findUnique({ where: { id } });
+    if (!recipe) throw new NotFoundException("Recept nem található");
+
+    await this.prisma.recipe.delete({ where: { id } });
+    return { deleted: true };
   }
 }

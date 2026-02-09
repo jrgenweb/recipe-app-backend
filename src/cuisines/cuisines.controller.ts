@@ -12,6 +12,7 @@ import {
 import { CuisinesService } from "./cuisines.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { IsString, MinLength } from "class-validator";
+import { AdminGuard } from "@/auth/guards/admin-auth.guard";
 
 class CreateCuisinDto {
   @IsString()
@@ -24,16 +25,21 @@ export class CuisinesController {
   constructor(private cuisines: CuisinesService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   create(@Body() dto: CreateCuisinDto) {
     return this.cuisines.create(dto.name);
   }
 
   @Get()
-  findAll(@Query("skip") skip?: string, @Query("take") take?: string) {
+  findAll(
+    @Query("search") search?: string,
+    @Query("skip") skip?: string,
+    @Query("take") take?: string,
+  ) {
     return this.cuisines.findAll(
       skip ? parseInt(skip, 10) : 0,
       take ? parseInt(take, 10) : 50,
+      search,
     );
   }
 
@@ -43,13 +49,13 @@ export class CuisinesController {
   }
 
   @Patch(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   update(@Param("id") id: string, @Body() dto: CreateCuisinDto) {
     return this.cuisines.update(id, dto.name);
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   remove(@Param("id") id: string) {
     return this.cuisines.remove(id);
   }
