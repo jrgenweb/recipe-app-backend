@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import { remove as removeDiacritics } from "diacritics";
 
 @Injectable()
 export class IngredientsService {
@@ -11,7 +12,9 @@ export class IngredientsService {
 
   async findAll(skip = 0, take = 20, search?: string) {
     const where = search
-      ? { OR: [{ name: { contains: search } }, { unit: { contains: search } }] }
+      ? {
+          OR: [{ name: { contains: search } }],
+        }
       : {};
     const [data, total] = await Promise.all([
       this.prisma.ingredient.findMany({

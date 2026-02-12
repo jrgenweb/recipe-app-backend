@@ -114,7 +114,7 @@ export async function seedIngredients() {
   const ingredients = new Set([
     ...MOCK_RECIPES.map((recipe) => {
       const ingredients = recipe.recipeIngredients.map((i) => {
-        return { name: i.name, unit: i.unit };
+        return { name: i.name.toLowerCase(), unit: i.unit };
       });
 
       return ingredients;
