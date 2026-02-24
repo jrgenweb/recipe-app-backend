@@ -20,6 +20,7 @@ npm install
 # Prisma kliens generálás és adatbázis létrehozása
 npx prisma generate
 npx prisma migrate dev --name init
+npx prisma db seed
 
 # Fejlesztői szerver (watch mode)
 npm run start:dev
@@ -32,6 +33,7 @@ Az API alapértelmezetten: **http://localhost:3000**
 ### Auth (nyilvános)
 - `POST /auth/register` – Regisztráció (body: name, email, password)
 - `POST /auth/login` – Bejelentkezés (body: email, password)
+- `POST /auth/check-email` - email ellenőrzés
 
 ### Auth (védett, Bearer token)
 - `GET /auth/me` – Bejelentkezett felhasználó adatai
@@ -43,11 +45,23 @@ Az API alapértelmezetten: **http://localhost:3000**
 ### Receptek
 - `GET /recipes` – Lista (query: skip, take, categoryId, search)
 - `GET /recipes/:id` – Egy recept részletei
+
+
+### Receptek (védett)
 - `POST /recipes` – Új recept (védett)
 - `PATCH /recipes/:id` – Szerkesztés (védett, csak tulajdonos)
 - `DELETE /recipes/:id` – Törlés (védett, csak tulajdonos)
 - `GET /recipes/my` – Saját receptek (védett)
 
+
+### Konyhák 
+- `GET /cuisines` – Lista
+
+### Konyhák (védett, admin)
+- `GET /cuisines` – Lista
+- `POST /cuisines` – Új (védett, body: name)
+- `PATCH /cuisines/:id` – Szerkesztés (védett)
+- `DELETE /cuisines/:id` – Törlés (védett)
 ### Kategóriák
 - `GET /categories` – Lista
 - `GET /categories/:id` – Egy kategória
