@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { MOCK_RECIPES } from "./_mock-recipes";
 
 const prisma = new PrismaClient();

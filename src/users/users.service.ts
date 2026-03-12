@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { AdminCreateUserDto, UserChangePasswordDto } from "./users.controller";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { IAdminCreateUser } from "@recipe/shared";
 import { RegisterDto } from "@/auth/dto/register.dto";
 import { contains, IsIn, IsString } from "class-validator";
