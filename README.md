@@ -1,117 +1,118 @@
 # Recipe App – NestJS + Prisma + SQLite
 
-A **projekt.md** alapján készült recept alkalmazás backend: REST API, auth, regisztráció, jogosultságkezelés.
+This is the backend for a recipe app.
+It uses REST API, authentication, registration, and role-based access.
 
 ## Követelmények
 
 - Node.js 18+
 - npm
 
-## Telepítés és indítás
+## Installation and Start
 
 ```bash
-# Függőségek
+# Install dependencies
 npm install
 
-# Környezeti változók (már létezik .env, ellenőrizd)
+# Environment variables (check .env)
 # DATABASE_URL="file:./dev.db"
-# JWT_SECRET="titkos-kulcs"
+# JWT_SECRET="secret-key"
 
-# Prisma kliens generálás és adatbázis létrehozása
+# Generate Prisma client and create database
 npx prisma generate
 npx prisma migrate dev --name init
 npx prisma db seed
 
-# Fejlesztői szerver (watch mode)
+# Start development server (watch mode)
 npm run start:dev
 ```
 
-Az API alapértelmezetten: **http://localhost:3000**
+Default API URL: **http://localhost:3000**
 
-## API végpontok
+## API Endpoints
 
-### Auth (nyilvános)
-- `POST /auth/register` – Regisztráció (body: name, email, password)
-- `POST /auth/login` – Bejelentkezés (body: email, password)
-- `POST /auth/check-email` - email ellenőrzés
+### Auth (public)
+- `POST /auth/register` – Register (body: name, email, password)
+- `POST /auth/login` – Login (body: email, password)
+- `POST /auth/check-email` - Check if email exists
 
-### Auth (védett, Bearer token)
-- `GET /auth/me` – Bejelentkezett felhasználó adatai
+### Auth (protected, Bearer token)
+- `GET /auth/me` – Current user info
 
 ### Felhasználók (védett)
-- `GET /users` – Lista (query: skip, take)
-- `GET /users/:id` – Egy felhasználó
+- `GET /users` – List (query: skip, take)
+- `GET /users/:id` – One user
 
-### Receptek
-- `GET /recipes` – Lista (query: skip, take, categoryId, search)
-- `GET /recipes/:id` – Egy recept részletei
-
-
-### Receptek (védett)
-- `POST /recipes` – Új recept (védett)
-- `PATCH /recipes/:id` – Szerkesztés (védett, csak tulajdonos)
-- `DELETE /recipes/:id` – Törlés (védett, csak tulajdonos)
-- `GET /recipes/my` – Saját receptek (védett)
+### Recipes
+- `GET /recipes` – List (query: skip, take, categoryId, search)
+- `GET /recipes/:id` – One recipe
 
 
-### Konyhák 
-- `GET /cuisines` – Lista
+### Recipes (protected)
+- `POST /recipes` – Add new recipe 
+- `PATCH /recipes/:id` – Edit recipe (only owner)
+- `DELETE /recipes/:id` – Delete recipe (only owner)
+- `GET /recipes/my` – My recipes 
 
-### Konyhák (védett, admin)
-- `GET /cuisines` – Lista
-- `POST /cuisines` – Új (védett, body: name)
-- `PATCH /cuisines/:id` – Szerkesztés (védett)
-- `DELETE /cuisines/:id` – Törlés (védett)
-### Kategóriák
-- `GET /categories` – Lista
-- `GET /categories/:id` – Egy kategória
-- `POST /categories` – Új (védett, body: name)
-- `PATCH /categories/:id` – Szerkesztés (védett)
-- `DELETE /categories/:id` – Törlés (védett)
 
-### Hozzászólások
-- `GET /recipes/:recipeId/comments` – Recept hozzászólásai
-- `POST /recipes/:recipeId/comments` – Új hozzászólás (védett, body: text)
-- `PATCH /comments/:id` – Szerkesztés (védett, csak tulajdonos)
-- `DELETE /comments/:id` – Törlés (védett, csak tulajdonos)
+### Cuisines 
+- `GET /cuisines` – List
 
-### Kedvencek (védett)
-- `GET /favorites` – Saját kedvencek
-- `POST /favorites/:recipeId` – Kedvencnek jelölés
-- `DELETE /favorites/:recipeId` – Kedvenc eltávolítás
-- `GET /favorites/check/:recipeId` – Kedvenc-e
+### Cuisines (protected, admin)
+- `GET /cuisines` – List
+- `POST /cuisines` – Add new cuisine ( body: name)
+- `PATCH /cuisines/:id` – Edit cuisine 
+- `DELETE /cuisines/:id` – Delete 
+### Categories
+- `GET /categories` – List
+- `GET /categories/:id` – One category
+- `POST /categories` – Add category (protected, body: name)
+- `PATCH /categories/:id` – Edit category (protected)
+- `DELETE /categories/:id` – Delete category (protected)
 
-### Értékelések
-- `GET /recipes/:recipeId/ratings/stats` – Átlag és darabszám
-- `POST /recipes/:recipeId/ratings` – Értékelés 1–5 (védett, body: rate)
-- `GET /recipes/:recipeId/ratings/me` – Saját értékelés (védett)
+### Comments
+- `GET /recipes/:recipeId/comments` – Comments for recipes
+- `POST /recipes/:recipeId/comments` – Add comment (protected, body: text)
+- `PATCH /comments/:id` – Edit comment (protected, only owner)
+- `DELETE /comments/:id` – Delete comment (protected, only owner)
 
-### Hozzávalók
-- `GET /ingredients` – Lista (query: skip, take, search)
-- `GET /ingredients/:id` – Egy hozzávaló
-- `POST /ingredients` – Új (védett, body: name, unit)
-- `PATCH /ingredients/:id` – Szerkesztés (védett)
-- `DELETE /ingredients/:id` – Törlés (védett)
+### Favorites (protected)
+- `GET /favorites` – My favorites
+- `POST /favorites/:recipeId` – Add favorite
+- `DELETE /favorites/:recipeId` – Remove favorite
+- `GET /favorites/check/:recipeId` – Check if favorite
 
-### Receptképek
-- `GET /recipes/:recipeId/images` – Recept képei
-- `POST /recipes/:recipeId/images` – Kép hozzáadása (védett, csak recept tulajdonos, body: url)
-- `DELETE /recipe-images/:id` – Kép törlése (védett, csak recept tulajdonos)
+### Ratings
+- `GET /recipes/:recipeId/ratings/stats` – Average and count
+- `POST /recipes/:recipeId/ratings` – Rate 1–5 (protected, body: rate)
+- `GET /recipes/:recipeId/ratings/me` – My rating (protected)
 
-## Jogosultság
+### Ingredients
+- `GET /ingredients` – List (query: skip, take, search)
+- `GET /ingredients/:id` – One ingredient
+- `POST /ingredients` – Add ingredient (protected, body: name, unit)
+- `PATCH /ingredients/:id` – Edit ingredient (protected)
+- `DELETE /ingredients/:id` – Delete (protected)
 
-- **Védett végpontok**: `Authorization: Bearer <access_token>` header szükséges (login/register válaszából).
-- Recepteknél: szerkesztés/törlés csak a recept tulajdonosának engedélyezett.
-- Hozzászólás: szerkesztés/törlés csak a hozzászólás szerzőjének.
+### Recipe Images
+- `GET /recipes/:recipeId/images` – Images for recipe
+- `POST /recipes/:recipeId/images` – Add image (protected, only owner, body: url)
+- `DELETE /recipe-images/:id` – Delete image (protected, only owner)
 
-## Parancsok
+## Permissions
 
-| Parancs | Leírás |
+- **Protected endpoints**: `Authorization: Bearer <access_token>` header 
+
+
+## Commands
+
+| Command | Description |
 |---------|--------|
-| `npm run start:dev` | Fejlesztői szerver (watch) |
+| `npm run start:dev` | Start dev server (watch) |
 | `npm run build` | Production build |
-| `npm run start:prod` | Production indítás |
-| `npx prisma studio` | Adatbázis böngésző UI |
-| `npx prisma migrate dev` | Új migráció készítése |
+| `npm run start:prod` | Run production server |
+| `npx prisma studio` | Open database UI |
+| `npx prisma migrate dev` | Create new migration |
 
-Az alkalmazás a **projekt.md** adatbázis tervének megfelelően működik (users, recipes, categories, recipe_categories, comments, favorites, ratings, recipe_images, recipe_ingredients, ingredients, recipe_steps).
+The app works with the database in **projekt.md**:
+(users, recipes, categories, recipe_categories, comments, favorites, ratings, recipe_images, recipe_ingredients, ingredients, recipe_steps)
