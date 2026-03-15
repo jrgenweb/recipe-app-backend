@@ -124,6 +124,7 @@ export async function seedIngredients() {
 
   const ingredientRecords = [];
   for (const ing of ingredients) {
+    ing.name = ing.name.toLowerCase();
     const record = await prisma.ingredient.upsert({
       where: { name: ing.name },
       update: {},

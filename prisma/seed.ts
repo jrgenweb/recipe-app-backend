@@ -24,10 +24,17 @@ async function main() {
   for (let recipe of MOCK_RECIPES) {
     //Categories
     const categoryIds = categoryRecords
-      .filter((c) => recipe.recipeCategories.includes(c.name))
+      .filter((c) =>
+        recipe.recipeCategories
+          .map((r) => r.toLowerCase())
+          .includes(c.name.toLowerCase()),
+      )
       .map((c) => c.id);
+    //console.log("categoryIds", recipe.name, categoryIds);
     //Cuisine
-    const cuisineId = cuisineRecords.find((c) => c.name === recipe.cuisine)?.id;
+    const cuisineId = cuisineRecords.find(
+      (c) => c.name.toLowerCase() === recipe.cuisine.toLowerCase(),
+    )?.id;
     //images
     const imageUrls = recipe.recipeImages.map((i) => i.url);
 
@@ -43,8 +50,8 @@ async function main() {
 
     const recipeRecord = await prisma.recipe.create({
       data: {
-        userId: user.id,
-        cuisineId: cuisineId!,
+        user: { connect: { id: user.id } },
+        cuisine: { connect: { id: cuisineId } },
         name: recipe.name,
 
         description: recipe.description,

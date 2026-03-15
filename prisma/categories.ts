@@ -27,7 +27,8 @@ export async function seedCagories() {
 
   const categoryRecords = [];
 
-  for (const name of categories) {
+  for (let name of categories) {
+    name = name.toLowerCase();
     const cat = await prisma.category.upsert({
       where: { name },
       update: {},

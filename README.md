@@ -1,14 +1,17 @@
-# Recipe App – NestJS + Prisma + SQLite
+# Recipe App – NestJS + Prisma + PostgreSql
 
 This is the backend for a recipe app.
 It uses REST API, authentication, registration, and role-based access.
 
-## Követelmények
+## Requirements
 
 - Node.js 18+
 - npm
+- docker
 
 ## Installation and Start
+
+You need to rename the .env.example -> .env, and change the DATABASE_URl connection string
 
 ```bash
 # Install dependencies

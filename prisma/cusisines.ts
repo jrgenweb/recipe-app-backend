@@ -26,7 +26,8 @@ export async function seedCuisines() {
   ).flat(1);
 
   const cuisineRecords = [];
-  for (const name of cuisines) {
+  for (let name of cuisines) {
+    name = name.toLowerCase();
     const c = await prisma.cuisine.upsert({
       where: { name },
       update: {},
