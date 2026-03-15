@@ -69,10 +69,11 @@ export class RecipesService {
       where.recipeCategories = { some: { categoryId } };
     }
     if (ingredientIds && ingredientIds.length > 0) {
-      where.recipeIngredients = {
-        some: { ingredientId: { in: ingredientIds } },
-      };
+      where.AND = ingredientIds.map((id) => ({
+        recipeIngredients: { some: { ingredientId: id } },
+      }));
     }
+
     if (search) {
       where.OR = [
         { name: { contains: search } },
